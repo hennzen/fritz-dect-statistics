@@ -1,0 +1,17 @@
+{
+  "name": "fritz-dect-440",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "fritzdect-aha-nodejs": "^2.1.0"
+  },
+  "engines" : { 
+    "node" : ">=20.6.0"
+  }
+}
