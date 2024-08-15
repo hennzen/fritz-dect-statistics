@@ -2,7 +2,7 @@
 echo "---------------- $(date)"
 # Exit early in case of errror
 set -e 
-cd /home/hennes/workspace/fritz-dect-440-reporter
+cd /home/hennes/workspace/fritz-dect-statistics
 echo "git pull"
 /usr/bin/git pull
 #echo "npm ci"
