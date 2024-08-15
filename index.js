@@ -9,35 +9,46 @@ const currentDate = new Date()
 const germanDate = currentDate.toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day:'2-digit' })
 const germanTime = currentDate.toLocaleTimeString('de-DE', { hour12: false })
 
-async function getTempAndHumidity() {
+async function getDectInfos() {
 	const login = await fritz.login_SID().catch((e) => {
 		console.log('fault calling login() ', e)
 	})
-	console.log('login', login)
+	console.log('Login: ', login)
 	
-	const devicelistinfosXml = await fritz.getDeviceInfos(process.env.AID)
-	console.log('XML response: ', devicelistinfosXml)
+	const dect440XmlResp = await fritz.getDeviceInfos(process.env.AID_DECT440)
+	console.log('DECT 440 XML response: ', dect440XmlResp)
+	const dect200XmlResp = await fritz.getDeviceInfos(process.env.AID_DECT200)
+	console.log('DECT 200 XML response: ', dect200XmlResp)
+	
 	const logout = await fritz.logout_SID()
-	console.log('logout', logout)
+	console.log('Logout: ', logout)
 	
-	const regex = /<celsius>(\d*)<\/celsius>.*<rel_humidity>(\d*)<\/rel_humidity>/g
-	const matchesArr = Array.from(devicelistinfosXml.matchAll(regex))
+	const dect440Regex = /<celsius>(\d*)<\/celsius>.*<rel_humidity>(\d*)<\/rel_humidity>/g
+	const dect440matchesArr = Array.from(dect440XmlResp.matchAll(dect440Regex))
+	
+	const dect200Regex = /<power>(\d*)<\/power>.*<energy>(\d*)<\/energy>.*<celsius>(\d*)<\/celsius>/g
+	const dect200matchesArr = Array.from(dect200XmlResp.matchAll(dect200Regex))
 	
 	// console.log('matches: ', matchesArr[0])
-	console.log('temp: ', matchesArr[0][1])
-	console.log('humidity: ', matchesArr[0][2])
+	console.log('DECT 440 temperature: ', dect440matchesArr[0][1])
+	console.log('DECT 440 humidity: ', dect440matchesArr[0][2])
+	console.log('DECT 200 power: ', dect200matchesArr[0][1])
+	console.log('DECT 200 energy: ', dect200matchesArr[0][2])
+	console.log('DECT 200 temperature: ', dect200matchesArr[0][3])
 	
-	const temp = matchesArr[0][1]
-	const hum = matchesArr[0][2]
+	const dect440Temp = dect440matchesArr[0][1] // 10th degrees celsius
+	const dect440Hum = dect440matchesArr[0][2]
+	const dect200Power = dect200matchesArr[0][1] // milliwatts integer
+	const dect200Energy = dect200matchesArr[0][2] // milliwatts-per-hour
+	const dect200Temp = dect200matchesArr[0][3] // 10th degrees celsius
 	
-	return [temp, hum]
+	return [dect440Temp, dect440Hum, dect200Power, dect200Energy, dect200Temp]
 }
 
-async function writeToFile(temp, hum) {
-	// https://geshan.com.np/blog/2022/04/nodejs-append-to-file/#sync-file-append-using-node.js
+async function writeToFile(dect440Temp, dect440Hum, dect200Power, dect200Energy, dect200Temp) {
 	try {
 		const fileName = 'statistics.csv'
-		const newCsvLine = `${germanDate};${germanTime};${temp};${hum};\n`
+		const newCsvLine = `${germanDate};${germanTime};${dect440Temp};${dect440Hum};${dect200Power};${dect200Energy};${dect200Temp};\n`
 		fs.appendFileSync(fileName, newCsvLine, 'utf-8');
 	} catch(err) {
 		console.log('Error appending data to file in sync mode', err);
@@ -68,8 +79,8 @@ async function sendEmail() {
 }
 
 async function run() {
-	let [temperature, humidity] = await getTempAndHumidity()
-	await writeToFile(temperature, humidity)
+	let [dect440Temp, dect440Hum, dect200Power, dect200Energy, dect200Temp] = await getDectInfos()
+	await writeToFile(dect440Temp, dect440Hum, dect200Power, dect200Energy, dect200Temp)
 	
 	// Send an email at the end of the day, i.e. between 23:31 and 23:59.
 	// This relies on cronjob running within this timeframe (15 minutes)
