@@ -13,7 +13,8 @@ curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && sudo apt-g
 
 # Setup
 1. `git clone` and `npm i`
-2. Create `.env` from `example.env` template and fill in the correct values
+2. Create `.env` from `example.env` template and fill in the correct values  
+AID is your DECT 440's Actuator ID
 
 ## Test run directly
 ```bash
