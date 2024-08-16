@@ -3,7 +3,7 @@ This little script serves my particular need to track a DECT 440's humidity and 
 
 Unfortunately, Fritz!DECT 440 does not yet offer (daily) push mails that would let me collect its data like I am used to with Fritz!DECT 200 devices sending temperature and Watt data.
 
-Using FritzBox' [HTTP-AHA-Interface](https://avm.de/fileadmin/user_upload/Global/Service/Schnittstellen/AHA-HTTP-Interface.pdf), [fritzdect-aha-nodejs](https://github.com/foxthefox/fritzdect-aha-nodejs), [Nodemailer](https://nodemailer.com/) and a Raspberry PI with a cronjob set up, this simple script accumulates measured values from DECT 440 and DECT 200 in a CSV file and sends it out vai email every evening.
+Using FritzBox' [HTTP-AHA-Interface](https://avm.de/fileadmin/user_upload/Global/Service/Schnittstellen/AHA-HTTP-Interface.pdf), [fritzdect-aha-nodejs](https://github.com/foxthefox/fritzdect-aha-nodejs), [Nodemailer](https://nodemailer.com/) and a Raspberry PI with a cronjob set up, this simple script accumulates measured values from DECT 440 and DECT 200 in a CSV file and sends it out via email every evening.
 
 # Prerequisites
 - Raspi (or any other Linux based machine running 24/7
@@ -32,7 +32,7 @@ node --env-file=.env index.js
 The shell script should have the executable bit checked out. If not, `chmod u+x run.sh` to add it.
 
 # Setup crontab
-`$ crontab -e` and add and modify this line
+`$ crontab -e`, add and modify this line
 ```
 15,30,45,0 * * * * /home/USER/PATH/fritz-dect-statistics/run.sh >> /home/USER/PATH/fritz-dect-statistics/run.log 2>&1`
 ```
