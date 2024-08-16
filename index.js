@@ -57,8 +57,8 @@ async function writeToFile(dect440Temp, dect440Hum, dect200Power, dect200Energy,
 
 async function sendEmail() {
 	const smtpTransport = nodemailer.createTransport({
-		host: 'smtp.goneo.de',
-		port: 465,
+		host: process.env.SMTP_HOST,
+		port: process.env.SMTP_PORT,
 		auth: {
 			user: process.env.SMTP_USERNAME,
 			pass: process.env.SMTP_PWD
