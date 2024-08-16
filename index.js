@@ -68,7 +68,7 @@ async function sendEmail() {
 	const message = {
 		from: process.env.EMAIL_FROM,
 		to: process.env.EMAIL_TO,
-		subject: `FRITZ!DECT 440 ${process.env.ROOM} (AID ${process.env.AID}) Info vom ${germanDate}`,
+		subject: `FRITZ!DECT 440 / 200 ${process.env.ROOM} Info vom ${germanDate}`,
 		text: process.env.EMAIL_BODY,
 		attachments: [
 			{ path: './statistics.csv' }
