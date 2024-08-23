@@ -1,2 +1,2 @@
 sep=;
-Zeitpunkt;DECT 440 10tel Temperatur;DECT 440 Relative Luftfeuchte in %;DECT 200 Leistung in Milliwatt;DECT 200 Energie in mWh;DECT 200 10tel Temperatur;
+Zeitpunkt;DECT 440 Relative Luftfeuchte (%);DECT 200 Leistung (W);DECT 200 Energie (Wh);DECT 440 Temperatur (°C);DECT 200 Temperatur (°C);

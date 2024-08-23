@@ -37,7 +37,7 @@ async function getDectInfos() {
 	console.log('DECT 200 temperature: ', dect200matchesArr[0][3])
 	
 	const dect440Temp = dect440matchesArr[0][1] // 10th degrees celsius
-	const dect440Hum = dect440matchesArr[0][2]
+	const dect440Hum = dect440matchesArr[0][2] // humidity in %
 	const dect200Power = dect200matchesArr[0][1] // milliwatts integer
 	const dect200Energy = dect200matchesArr[0][2] // milliwatts-per-hour
 	const dect200Temp = dect200matchesArr[0][3] // 10th degrees celsius
@@ -48,7 +48,7 @@ async function getDectInfos() {
 async function writeToFile(dect440Temp, dect440Hum, dect200Power, dect200Energy, dect200Temp) {
 	try {
 		const fileName = 'statistics.csv'
-		const newCsvLine = `"${germanDate} ${germanTimeWoSeconds}";${dect440Temp};${dect440Hum};${dect200Power};${dect200Energy};${dect200Temp};\n`
+		const newCsvLine = `"${germanDate} ${germanTimeWoSeconds}";${dect440Hum};${String(dect200Power / 1000).replace('.', ',')};${String(dect200Energy / 1000).replace('.', ',')};${String(dect440Temp / 10).replace('.', ',')};${String(dect200Temp / 10).replace('.', ',')};\n`
 		fs.appendFileSync(fileName, newCsvLine, 'utf-8');
 	} catch(err) {
 		console.log('Error appending data to file in sync mode', err);
