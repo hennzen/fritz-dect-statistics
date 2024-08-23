@@ -7,7 +7,7 @@ const fritz = new Fritz(process.env.FRITZ_USERNAME, process.env.FRITZ_PWD, 'http
 const currentDate = new Date()
 // https://www.freeformatter.com/germany-standards-code-snippets.html
 const germanDate = currentDate.toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day:'2-digit' })
-const germanTime = currentDate.toLocaleTimeString('de-DE', { hour12: false })
+const germanTimeWoSeconds = currentDate.toLocaleTimeString('de-DE', { hour12: false }).substring(0,5)
 
 async function getDectInfos() {
 	const login = await fritz.login_SID().catch((e) => {
@@ -48,7 +48,7 @@ async function getDectInfos() {
 async function writeToFile(dect440Temp, dect440Hum, dect200Power, dect200Energy, dect200Temp) {
 	try {
 		const fileName = 'statistics.csv'
-		const newCsvLine = `${germanDate};${germanTime};${dect440Temp};${dect440Hum};${dect200Power};${dect200Energy};${dect200Temp};\n`
+		const newCsvLine = `"${germanDate} ${germanTimeWoSeconds}";${dect440Temp};${dect440Hum};${dect200Power};${dect200Energy};${dect200Temp};\n`
 		fs.appendFileSync(fileName, newCsvLine, 'utf-8');
 	} catch(err) {
 		console.log('Error appending data to file in sync mode', err);
@@ -84,7 +84,7 @@ async function run() {
 	
 	// Send an email at the end of the day, i.e. between 23:31 and 23:59.
 	// This relies on cronjob running within this timeframe (15 minutes)
-	if (germanTime.split(':')[0] === '23' && parseInt(germanTime.split(':')[1]) > 31 && parseInt(germanTime.split(':')[1]) < 59) {
+	if (germanTimeWoSeconds.split(':')[0] === '23' && parseInt(germanTimeWoSeconds.split(':')[1]) > 31 && parseInt(germanTimeWoSeconds.split(':')[1]) < 59) {
 		await sendEmail()
 	}
 }
