@@ -45,10 +45,37 @@ async function getDectInfos() {
 	return [dect440Temp, dect440Hum, dect200Power, dect200Energy, dect200Temp]
 }
 
-async function writeToFile(dect440Temp, dect440Hum, dect200Power, dect200Energy, dect200Temp) {
+async function getWeather() {
+	// use env variables for long lat and api key
+	
+	const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${process.env.OPENWEATHER_LATITUDE}&lon=${process.env.OPENWEATHER_LONGITUDE}&units=metric&lang=de&appid=${process.env.OPENWEATHER_API_KEY}`)
+	const data = await response.json()
+
+	const weather = data.weather[0].description
+	const temperature = data.main.temp
+	const humidity = data.main.humidity
+	const rain = data.rain ? data.rain['1h'] : 0
+
+	console.log('Openweathermap: ', { weather, temperature, humidity, rain })
+	
+	return { weather, temperature, humidity, rain }
+}
+
+async function writeToFile(dect440Temp, dect440Hum, dect200Power, dect200Energy, dect200Temp, weather, temperature, humidity, rain) {
 	try {
 		const fileName = 'statistics.csv'
-		const newCsvLine = `"${germanDate} ${germanTimeWoSeconds}";${dect440Hum};${String(dect200Power / 1000).replace('.', ',')};${String(dect200Energy / 1000).replace('.', ',')};${String(dect440Temp / 10).replace('.', ',')};${String(dect200Temp / 10).replace('.', ',')};\n`
+		const newCsvLine =
+			`"${germanDate} ${germanTimeWoSeconds}";` +
+			`${dect440Hum};` +
+			`${String(dect200Power / 1000).replace('.', ',')};` + 
+			`${String(dect200Energy / 1000).replace('.', ',')};` +
+			`${String(dect440Temp / 10).replace('.', ',')};` +
+			`${String(dect200Temp / 10).replace('.', ',')};` + 
+			`${weather};`+
+			`${String(temperature).replace('.', ',')};` +
+			`${String(humidity)};` +
+			`${String(rain)};` +
+			`\n`;
 		fs.appendFileSync(fileName, newCsvLine, 'utf-8');
 	} catch(err) {
 		console.log('Error appending data to file in sync mode', err);
@@ -80,7 +107,9 @@ async function sendEmail() {
 
 async function run() {
 	let [dect440Temp, dect440Hum, dect200Power, dect200Energy, dect200Temp] = await getDectInfos()
-	await writeToFile(dect440Temp, dect440Hum, dect200Power, dect200Energy, dect200Temp)
+	let { weather, temperature, humidity, rain } = await getWeather()
+	
+	await writeToFile(dect440Temp, dect440Hum, dect200Power, dect200Energy, dect200Temp, weather, temperature, humidity, rain)
 	
 	// Send an email at the end of the day, i.e. between 23:31 and 23:59.
 	// This relies on cronjob running within this timeframe (15 minutes)
